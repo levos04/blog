@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrada Individual</title>
+    <link rel="stylesheet" href="inicio.css">
+</head>
+<body>
+    <header>
+        <h1 id="titulo"></h1>
+        <h3 id="fecha"></h3>
+    </header>
+    <div style="display: flex; max-width: 1000px; margin: auto; margin-top: 60px;">
+        <p id="contenido" style="padding: 10px;"></p>
+        <img id="foto" alt="foto" width="350" style="padding: 10px;">
+    </div>
+
+    <script>
+        // Función para obtener los parámetros de la URL
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                title: params.get('title')
+            };
+        }
+
+        // Función para obtener los datos del archivo fechas.json
+        async function fetchBlogPosts() {
+            try {
+                const response = await fetch('data/fechas.json'); // Ruta del archivo JSON
+                const posts = await response.json();
+                return posts;
+            } catch (error) {
+                console.error('Error al obtener las entradas del blog:', error);
+                return [];
+            }
+        }
+
+        // Función para mostrar los datos de la entrada en la página
+        async function displayEntry() {
+            const { title } = getQueryParams();
+            const blogPosts = await fetchBlogPosts(); // Obtener datos del archivo JSON
+            
+            // Buscar el post correspondiente al título
+            const post = blogPosts.find(p => p.title === title);
+            if (post) {
+                // Actualizar el contenido de la página con los datos
+                document.getElementById('titulo').textContent = post.title;
+                document.getElementById('fecha').textContent = `Fecha: ${post.date}`;
+                document.getElementById('contenido').textContent = post.content;
+                document.getElementById('foto').src = post.foto;
+                document.getElementById('foto').alt = post.title;
+            } else {
+                console.error('Entrada no encontrada');
+            }
+        }
+
+        // Ejecutamos la función al cargar la página
+        document.addEventListener('DOMContentLoaded', displayEntry);
+    </script>
+</body>
+</html>
